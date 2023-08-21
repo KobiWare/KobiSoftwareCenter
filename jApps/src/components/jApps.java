@@ -16,7 +16,6 @@ import java.util.Map;
 import java.nio.file.Path;
 import com.google.gson.Gson;
 
-
 // TODO: Add uninstall feature
 
 public class jApps extends JPanel
@@ -32,18 +31,17 @@ public class jApps extends JPanel
 
     // TODO: Checkbox for network/USB downloads
 
-    private final JCheckBox showApps  = new JCheckBox("Display Apps", true);
-    private final JCheckBox showRoms  = new JCheckBox("Display ROMS", true);
+    private final JCheckBox showApps = new JCheckBox("Display Apps", true);
+    private final JCheckBox showRoms = new JCheckBox("Display ROMS", true);
     private final JCheckBox showOther = new JCheckBox("Display 'Other'", true);
     private final JTextField search;
     private final boolean isMainFrame;
     private final String usbName = appConfig.USB_NAME;
 
-    //Create and set up the window.
+    // Create and set up the window.
     private static final JFrame frame = new JFrame(appConfig.APP_NAME);
 
     private static final String installString = "Install";
-
 
     // If isMainFrame, include install button and stuff
     public jApps(boolean isMainFrame) {
@@ -77,30 +75,27 @@ public class jApps extends JPanel
                 BoxLayout.LINE_AXIS));
         JLabel searchText = new JLabel("Search");
         searchText.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 20));
-        searchText.setBorder(new EmptyBorder(0,0,0,5));
+        searchText.setBorder(new EmptyBorder(0, 0, 0, 5));
         buttonPane.add(searchText);
         buttonPane.add(search);
         buttonPane.add(Box.createHorizontalStrut(5));
         buttonPane.add(new JSeparator(SwingConstants.VERTICAL));
         buttonPane.add(Box.createHorizontalStrut(5));
 
-        if(isMainFrame)
+        if (isMainFrame)
             buttonPane.add(installButton);
-        buttonPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-
+        buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 
-
         // Font ideas: Poor Richard
-        //             Franklin Gothic Demi
+        // Franklin Gothic Demi
 
         Font bigFont = new Font("Poor Richard", Font.PLAIN, 40);
         title = new JLabel("");
         title.setVerticalAlignment(JLabel.TOP);
 
         title.setFont(bigFont);
-
 
         description = new JLabel("");
         description.setVerticalAlignment(JLabel.TOP);
@@ -118,7 +113,6 @@ public class jApps extends JPanel
         showApps.addActionListener(showListener);
         showRoms.addActionListener(showListener);
         showOther.addActionListener(showListener);
-
 
         search.getDocument().addDocumentListener(new SearchListener());
 
@@ -139,14 +133,14 @@ public class jApps extends JPanel
 
         topButtonPane.add(refreshButton);
 
-        if(isMainFrame)
+        if (isMainFrame)
             topButtonPane.add(optionsButton);
         topButtonPane.add(usbDetectedText);
 
         add(listScrollPane, BorderLayout.CENTER);
         add(splitPane, BorderLayout.EAST);
         add(buttonPane, BorderLayout.PAGE_END);
-        if(isMainFrame)
+        if (isMainFrame)
             add(topButtonPane, BorderLayout.PAGE_START);
 
         checkForUSB();
@@ -165,10 +159,13 @@ public class jApps extends JPanel
         public void insertUpdate(DocumentEvent e) {
             sortList();
         }
+
         public void removeUpdate(DocumentEvent e) {
             sortList();
         }
-        public void changedUpdate(DocumentEvent e) {}
+
+        public void changedUpdate(DocumentEvent e) {
+        }
     }
 
     class InstallListener implements ActionListener {
@@ -182,21 +179,20 @@ public class jApps extends JPanel
         public void actionPerformed(ActionEvent e) {
             Item item = (Item) list.getSelectedValue();
 
-            if(!confirmDownload(item)) {
+            if (!confirmDownload(item)) {
                 return;
             }
 
             Copy a = new Copy(item);
 
-            //Do whatever
+            // Do whatever
             try {
                 a.copyTo(item.getInstallLoc() + item.toString());
-            } catch(Exception IOException) {
+            } catch (Exception IOException) {
                 JOptionPane.showMessageDialog(frame, "Error: " + IOException);
             }
         }
     }
-
 
     class RefreshListener implements ActionListener {
         private boolean alreadyEnabled = false;
@@ -213,8 +209,9 @@ public class jApps extends JPanel
             sortList();
         }
     }
+
     public void delete(int index) {
-        if(tempList.size() > 0) {
+        if (tempList.size() > 0) {
             System.out.println("Removing at index " + index);
             tempList.remove(index);
             sortList();
@@ -236,7 +233,8 @@ public class jApps extends JPanel
     private void checkForUSB() {
         usbDetected = new File(appConfig.USB_NAME + appConfig.USB_DETECTOR_NAME).isFile();
         System.out.println(usbDetected);
-        usbDetectedText.setText("<html><p style=\"padding-left: 5px; padding-right: 5px; color: #9A9A9A\">" + (usbDetected ? "USB detected!" : "No USB found...") + "</p></html>");
+        usbDetectedText.setText("<html><p style=\"padding-left: 5px; padding-right: 5px; color: #9A9A9A\">"
+                + (usbDetected ? "USB detected!" : "No USB found...") + "</p></html>");
     }
 
     private void checkForNewApps() {
@@ -246,19 +244,22 @@ public class jApps extends JPanel
             String content = Files.readString(Path.of(System.getProperty("user.dir") + "/" + appConfig.APPS_CONFIG));
             Gson gson = new Gson();
             final ArrayList allItems = ((ArrayList) gson.fromJson(content, Map.class).get("apps"));
-            for(int i = 0; i < allItems.size(); i++) {
+            for (int i = 0; i < allItems.size(); i++) {
                 Item currentItem = Item.convertToItem((ArrayList) allItems.get(i));
                 listModel.addElement(currentItem);
             }
-        } catch(Exception e) {
-            JOptionPane.showOptionDialog(null, e.toString(), "", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+        } catch (Exception e) {
+            JOptionPane.showOptionDialog(null, e.toString(), "", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE,
+                    null, null, null);
         }
     }
 
     private boolean confirmDownload(Item item) {
-        String info = "You are going to install: " + item + "\n\nInfo:\nFile Size: " + item.prettyFileSize() + "\nETA: " + item.eta();
+        String info = "You are going to install: " + item + "\n\nInfo:\nFile Size: " + item.prettyFileSize() + "\nETA: "
+                + item.eta();
         int quit;
-        quit = JOptionPane.showOptionDialog(null, info, item.toString(), JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+        quit = JOptionPane.showOptionDialog(null, info, item.toString(), JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE, null, null, null);
         return quit == 0;
     }
 
@@ -268,8 +269,13 @@ public class jApps extends JPanel
             title.setText(list.getSelectedValue().toString());
 
             Item desc = (Item) (list.getSelectedValue());
-            description.setText("<html><p style=\"width:250px\">" + desc.getDescription() + "<br><br>" + "<b style=" + (desc.getIfNetworkDownload() ? "\"color: blue\">Network download avaiable!" : "\"color: #BBBBFF\">No network download..") + "</b><br>" + "<b style=" + (desc.getIfUsbDownload() ? "\"color: red\">USB download avaiable!" : "\"color: #FFBBBB\">No usb download..") + "</b>" + "</b>" + "<br><br> " + "</p></html>");
-        } catch(Exception e) {
+            description.setText("<html><p style=\"width:250px\">" + desc.getDescription() + "<br><br>" + "<b style="
+                    + (desc.getIfNetworkDownload() ? "\"color: blue\">Network download avaiable!"
+                            : "\"color: #BBBBFF\">No network download..")
+                    + "</b><br>" + "<b style=" + (desc.getIfUsbDownload() ? "\"color: red\">USB download avaiable!"
+                            : "\"color: #FFBBBB\">No usb download..")
+                    + "</b>" + "</b>" + "<br><br> " + "</p></html>");
+        } catch (Exception e) {
             title.setText("No apps found");
             description.setText("No apps currently available");
         }
@@ -277,14 +283,14 @@ public class jApps extends JPanel
 
     private void setTempListToListModel() {
         tempList = new DefaultListModel();
-        for(int i = 0; i < listModel.size(); i++) {
+        for (int i = 0; i < listModel.size(); i++) {
             tempList.addElement(listModel.get(i));
         }
     }
 
     private void updateList() {
-		// Loads list items
-		
+        // Loads list items
+
         listModel = new DefaultListModel();
 
         // Load apps from json
@@ -333,21 +339,22 @@ public class jApps extends JPanel
         // TODO: Stop double-updating the description
         try {
             updateDescription();
-        } catch(Exception err) {}
+        } catch (Exception err) {
+        }
     }
 
     public static void updateAppJson() {
         // Update the internal json for storing apps as the current list
         // TODO:
         String builtJson = "{\n" +
-                                "\t\"apps\": [\n";
-        for(int i = 0; i < tempList.size(); i++) {
+                "\t\"apps\": [\n";
+        for (int i = 0; i < tempList.size(); i++) {
             builtJson += "\t\t\t\t" + ((Item) tempList.get(i)).getAsJson();
-            if(i != tempList.size() - 1)
+            if (i != tempList.size() - 1)
                 builtJson += ",\n";
         }
         builtJson += "\n\t]\n" +
-                     "}";
+                "}";
         System.out.println("Saving changes to app json...");
 
         try {
@@ -365,8 +372,6 @@ public class jApps extends JPanel
         }
     }
 
-
-
     // Returns a JScrollPane of all the apps
     public JScrollPane listWidget() {
         JScrollPane listScrollPane = new JScrollPane(list);
@@ -382,12 +387,12 @@ public class jApps extends JPanel
     private static void createAndShowGUI() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //Create and set up the content pane.
+        // Create and set up the content pane.
         JComponent newContentPane = new jApps(true);
-        newContentPane.setOpaque(true); //content panes must be opaque
+        newContentPane.setOpaque(true); // content panes must be opaque
         frame.setContentPane(newContentPane);
 
-        //Display the window.
+        // Display the window.
         frame.pack();
         frame.setVisible(true);
     }
